@@ -33,8 +33,8 @@ public class AnnotatedMemcachedMonitor {
 
     private String key(ProceedingJoinPoint joinPoint) {
         return new StringBuilder()
-                .append(joinPoint.getClass())
                 .append(joinPoint.getSignature().getDeclaringTypeName())
+                .append("_")
                 .append(joinPoint.getSignature().getName())
                 .toString();
     }

@@ -125,8 +125,8 @@ public class AnnotatedMemcachedTest {
         AnnotatedMemcachedMonitor amm = new AnnotatedMemcachedMonitor();
         amm.cache(testPoint);
         String expectedKey = new StringBuilder()
-                .append(testPoint.getClass())
                 .append(testPoint.getSignature().getDeclaringTypeName())
+                .append("_")
                 .append(testPoint.getSignature().getName())
                 .toString();
         assertTrue(amm.getCache().containsKey(expectedKey));
@@ -137,8 +137,8 @@ public class AnnotatedMemcachedTest {
         AnnotatedMemcachedMonitor amm = new AnnotatedMemcachedMonitor();
         amm.cache(testPoint);
         String expectedKey = new StringBuilder()
-                .append(testPoint.getClass())
                 .append(testPoint.getSignature().getDeclaringTypeName())
+                .append("_")
                 .append(testPoint.getSignature().getName())
                 .toString();
         final Object value = amm.getCache().get(expectedKey);
