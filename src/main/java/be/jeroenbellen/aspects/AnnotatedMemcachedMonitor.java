@@ -20,11 +20,11 @@ public class AnnotatedMemcachedMonitor {
 
     @Around("execution(@be.jeroenbellen.annotations.Memcacheable * *..*(..))")
     public Object cache(ProceedingJoinPoint joinPoint) throws Throwable {
-        this.logger.debug("Doing magic!");
+        this.logger.info("Doing magic!");
         final String key = key(joinPoint);
         Object value = this.cache.get(key);
         if (value == null) {
-            this.logger.debug("First time, lets cache!");
+            this.logger.info("First time, lets cache!");
             value = joinPoint.proceed();
             cache.put(key, value);
         }
