@@ -4,6 +4,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.reflect.SourceLocation;
 import org.aspectj.runtime.internal.AroundClosure;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -19,92 +20,99 @@ import static org.junit.Assert.fail;
 public class AnnotatedMemcachedTest {
     private final String failMessage = "Not supposed to be called";
 
-    private ProceedingJoinPoint testPoint = new ProceedingJoinPoint() {
-        public void set$AroundClosure(AroundClosure arc) {
-            fail(failMessage);
-        }
+    private ProceedingJoinPoint testPoint;
 
-        public Object proceed() throws Throwable {
-            return BigDecimal.ONE;
-        }
+    @Before
+    public void setUp() {
+        testPoint = new ProceedingJoinPoint() {
+            private int count = 0;
 
-        public Object proceed(Object[] args) throws Throwable {
-            fail(failMessage);
-            return null;
-        }
+            public void set$AroundClosure(AroundClosure arc) {
+                fail(failMessage);
+            }
 
-        public String toShortString() {
-            fail(failMessage);
-            return null;
-        }
+            public Object proceed() throws Throwable {
+                return new BigDecimal(++count);
+            }
 
-        public String toLongString() {
-            fail(failMessage);
-            return null;
-        }
+            public Object proceed(Object[] args) throws Throwable {
+                fail(failMessage);
+                return null;
+            }
 
-        public Object getThis() {
-            fail(failMessage);
-            return null;
-        }
+            public String toShortString() {
+                fail(failMessage);
+                return null;
+            }
 
-        public Object getTarget() {
-            fail(failMessage);
-            return null;
-        }
+            public String toLongString() {
+                fail(failMessage);
+                return null;
+            }
 
-        public Object[] getArgs() {
-            fail(failMessage);
-            return null;
-        }
+            public Object getThis() {
+                fail(failMessage);
+                return null;
+            }
 
-        public Signature getSignature() {
-            return new Signature() {
-                public String toShortString() {
-                    fail(failMessage);
-                    return null;
-                }
+            public Object getTarget() {
+                fail(failMessage);
+                return null;
+            }
 
-                public String toLongString() {
-                    fail(failMessage);
-                    return null;
-                }
+            public Object[] getArgs() {
+                fail(failMessage);
+                return null;
+            }
 
-                public String getName() {
-                    return "myName";
-                }
+            public Signature getSignature() {
+                return new Signature() {
+                    public String toShortString() {
+                        fail(failMessage);
+                        return null;
+                    }
 
-                public int getModifiers() {
-                    fail(failMessage);
-                    return 0;
-                }
+                    public String toLongString() {
+                        fail(failMessage);
+                        return null;
+                    }
 
-                public Class getDeclaringType() {
-                    fail(failMessage);
-                    return null;
-                }
+                    public String getName() {
+                        return "myName";
+                    }
 
-                public String getDeclaringTypeName() {
-                    return "myType";
-                }
-            };
-        }
+                    public int getModifiers() {
+                        fail(failMessage);
+                        return 0;
+                    }
 
-        public SourceLocation getSourceLocation() {
-            fail(failMessage);
-            return null;
-        }
+                    public Class getDeclaringType() {
+                        fail(failMessage);
+                        return null;
+                    }
 
-        public String getKind() {
-            fail(failMessage);
-            return null;
-        }
+                    public String getDeclaringTypeName() {
+                        return "myType";
+                    }
+                };
+            }
 
-        public StaticPart getStaticPart() {
-            fail(failMessage);
-            return null;
-        }
-    };
+            public SourceLocation getSourceLocation() {
+                fail(failMessage);
+                return null;
+            }
+
+            public String getKind() {
+                fail(failMessage);
+                return null;
+            }
+
+            public StaticPart getStaticPart() {
+                fail(failMessage);
+                return null;
+            }
+        };
+    }
 
     @Test
     public void testMethodExecution() throws Throwable {
@@ -116,7 +124,7 @@ public class AnnotatedMemcachedTest {
     public void testCacheKey() throws Throwable {
         AnnotatedMemcachedMonitor amm = new AnnotatedMemcachedMonitor();
         amm.cache(testPoint);
-        String expectedKey =  new StringBuilder()
+        String expectedKey = new StringBuilder()
                 .append(testPoint.getClass())
                 .append(testPoint.getSignature().getDeclaringTypeName())
                 .append(testPoint.getSignature().getName())
@@ -125,16 +133,24 @@ public class AnnotatedMemcachedTest {
     }
 
     @Test
-    public void testCache() throws Throwable {
+    public void testCacheIsFilled() throws Throwable {
         AnnotatedMemcachedMonitor amm = new AnnotatedMemcachedMonitor();
         amm.cache(testPoint);
-        String expectedKey =  new StringBuilder()
+        String expectedKey = new StringBuilder()
                 .append(testPoint.getClass())
                 .append(testPoint.getSignature().getDeclaringTypeName())
                 .append(testPoint.getSignature().getName())
                 .toString();
         final Object value = amm.getCache().get(expectedKey);
         assertTrue(BigDecimal.ONE.equals(value));
+    }
+
+    @Test
+    public void testCache() throws Throwable {
+        AnnotatedMemcachedMonitor amm = new AnnotatedMemcachedMonitor();
+        amm.cache(testPoint);
+        amm.cache(testPoint);
+        assertTrue(BigDecimal.ONE.equals(amm.cache(testPoint)));
     }
 
 }
