@@ -1,5 +1,6 @@
 package be.jeroenbellen.aspects;
 
+import be.jeroenbellen.annotations.Memcacheable;
 import be.jeroenbellen.cache.ICache;
 import net.rubyeye.xmemcached.XMemcachedClient;
 import org.apache.log4j.Logger;
@@ -25,13 +26,14 @@ public class AnnotatedMemcachedMonitor {
         this.cache = cache;
     }
 
-    @Around("execution(@be.jeroenbellen.annotations.Memcacheable * *..*(..))")
-    public Object cache(ProceedingJoinPoint joinPoint) throws Throwable {
-        this.logger.info("Doing magic!");
+//    @Around("execution(@be.jeroenbellen.annotations.Memcacheable * *..*(..))")
+    @Around("execution(* *..*(..)) && @annotation(memcacheable)")
+    public Object cache(final ProceedingJoinPoint joinPoint, final Memcacheable memcacheable) throws Throwable {
+        this.logger.debug("Doing magic!");
         final String key = key(joinPoint);
         Object value = this.cache.get(key);
         if (value == null) {
-            this.logger.info("First time, lets cache!");
+            this.logger.debug("First time, lets cache!");
             value = joinPoint.proceed();
             cache.put(key, value);
         }

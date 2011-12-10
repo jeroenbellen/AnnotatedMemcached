@@ -30,7 +30,7 @@ public class AnnotatedMemcachedIntegrationTest {
     private AnnotatedMemcachedMonitor annotatedMemcachedMonitor;
     @Autowired
     private XMemcachedClient xMemcachedClient;
-    
+
     private String testKey = "be.jeroenbellen.aspects.MyTestService_greet";
 
     @Before

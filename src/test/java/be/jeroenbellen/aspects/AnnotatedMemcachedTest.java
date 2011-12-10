@@ -122,13 +122,13 @@ public class AnnotatedMemcachedTest {
     @Test
     public void testMethodExecution() throws Throwable {
         AnnotatedMemcachedMonitor amm = new AnnotatedMemcachedMonitor(this.cache);
-        assertTrue(BigDecimal.ONE.equals(amm.cache(testPoint)));
+        assertTrue(BigDecimal.ONE.equals(amm.cache(testPoint, null)));
     }
 
     @Test
     public void testCacheKey() throws Throwable {
         AnnotatedMemcachedMonitor amm = new AnnotatedMemcachedMonitor(this.cache);
-        amm.cache(testPoint);
+        amm.cache(testPoint, null);
         String expectedKey = new StringBuilder()
                 .append(testPoint.getSignature().getDeclaringTypeName())
                 .append("_")
@@ -140,7 +140,7 @@ public class AnnotatedMemcachedTest {
     @Test
     public void testCacheIsFilled() throws Throwable {
         AnnotatedMemcachedMonitor amm = new AnnotatedMemcachedMonitor(this.cache);
-        amm.cache(testPoint);
+        amm.cache(testPoint, null);
         String expectedKey = new StringBuilder()
                 .append(testPoint.getSignature().getDeclaringTypeName())
                 .append("_")
@@ -153,12 +153,12 @@ public class AnnotatedMemcachedTest {
     @Test
     public void testCache() throws Throwable {
         AnnotatedMemcachedMonitor amm = new AnnotatedMemcachedMonitor(this.cache);
-        amm.cache(testPoint);
-        amm.cache(testPoint);
-        assertTrue(BigDecimal.ONE.equals(amm.cache(testPoint)));
+        amm.cache(testPoint, null);
+        amm.cache(testPoint, null);
+        assertTrue(BigDecimal.ONE.equals(amm.cache(testPoint, null)));
     }
 
-    private class CacheStub implements ICache{
+    private class CacheStub implements ICache {
         private Map<String, Object> cache = new HashMap<String, Object>();
 
 
