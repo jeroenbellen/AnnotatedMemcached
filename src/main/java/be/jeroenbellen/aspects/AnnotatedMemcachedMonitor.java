@@ -1,9 +1,12 @@
 package be.jeroenbellen.aspects;
 
+import be.jeroenbellen.cache.ICache;
+import net.rubyeye.xmemcached.XMemcachedClient;
 import org.apache.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +19,11 @@ import java.util.Map;
 @Aspect
 public class AnnotatedMemcachedMonitor {
     private final Logger logger = Logger.getLogger(getClass());
-    private Map<String, Object> cache = new HashMap<String, Object>();
+    private ICache cache;
+
+    public AnnotatedMemcachedMonitor(ICache cache) {
+        this.cache = cache;
+    }
 
     @Around("execution(@be.jeroenbellen.annotations.Memcacheable * *..*(..))")
     public Object cache(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -39,7 +46,7 @@ public class AnnotatedMemcachedMonitor {
                 .toString();
     }
 
-    public Map<String, Object> getCache() {
+    public ICache getCache() {
         return cache;
     }
 }

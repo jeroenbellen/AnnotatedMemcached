@@ -1,5 +1,6 @@
 package be.jeroenbellen.aspects;
 
+import be.jeroenbellen.cache.ICache;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.reflect.SourceLocation;
@@ -8,6 +9,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -21,10 +24,12 @@ public class AnnotatedMemcachedTest {
     private final String failMessage = "Not supposed to be called";
 
     private ProceedingJoinPoint testPoint;
+    private ICache cache;
 
     @Before
     public void setUp() {
-        testPoint = new ProceedingJoinPoint() {
+        this.cache = new CacheStub();
+        this.testPoint = new ProceedingJoinPoint() {
             private int count = 0;
 
             public void set$AroundClosure(AroundClosure arc) {
@@ -116,13 +121,13 @@ public class AnnotatedMemcachedTest {
 
     @Test
     public void testMethodExecution() throws Throwable {
-        AnnotatedMemcachedMonitor amm = new AnnotatedMemcachedMonitor();
+        AnnotatedMemcachedMonitor amm = new AnnotatedMemcachedMonitor(this.cache);
         assertTrue(BigDecimal.ONE.equals(amm.cache(testPoint)));
     }
 
     @Test
     public void testCacheKey() throws Throwable {
-        AnnotatedMemcachedMonitor amm = new AnnotatedMemcachedMonitor();
+        AnnotatedMemcachedMonitor amm = new AnnotatedMemcachedMonitor(this.cache);
         amm.cache(testPoint);
         String expectedKey = new StringBuilder()
                 .append(testPoint.getSignature().getDeclaringTypeName())
@@ -134,7 +139,7 @@ public class AnnotatedMemcachedTest {
 
     @Test
     public void testCacheIsFilled() throws Throwable {
-        AnnotatedMemcachedMonitor amm = new AnnotatedMemcachedMonitor();
+        AnnotatedMemcachedMonitor amm = new AnnotatedMemcachedMonitor(this.cache);
         amm.cache(testPoint);
         String expectedKey = new StringBuilder()
                 .append(testPoint.getSignature().getDeclaringTypeName())
@@ -147,10 +152,26 @@ public class AnnotatedMemcachedTest {
 
     @Test
     public void testCache() throws Throwable {
-        AnnotatedMemcachedMonitor amm = new AnnotatedMemcachedMonitor();
+        AnnotatedMemcachedMonitor amm = new AnnotatedMemcachedMonitor(this.cache);
         amm.cache(testPoint);
         amm.cache(testPoint);
         assertTrue(BigDecimal.ONE.equals(amm.cache(testPoint)));
     }
 
+    private class CacheStub implements ICache{
+        private Map<String, Object> cache = new HashMap<String, Object>();
+
+
+        public Object get(String key) {
+            return this.cache.get(key);
+        }
+
+        public void put(String key, Object data) {
+            this.cache.put(key, data);
+        }
+
+        public boolean containsKey(String key) {
+            return this.cache.containsKey(key);
+        }
+    }
 }

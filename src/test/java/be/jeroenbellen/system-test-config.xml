@@ -7,8 +7,17 @@
 
     <import resource="classpath:be/jeroenbellen/aspects/aspects-config.xml"/>
 
+    <bean id="xmemcachedClient" class="net.rubyeye.xmemcached.XMemcachedClient">
+        <constructor-arg name="server" value="localhost"/>
+        <constructor-arg name="port" value="11211"/>
+    </bean>
+
+    <bean id="cache" class="be.jeroenbellen.cache.MemcachedCache">
+        <constructor-arg name="xMemcachedClient" ref="xmemcachedClient"/>
+    </bean>
+
     <context:annotation-config/>
-    
-    <context:component-scan base-package="be.jeroenbellen" />
+
+    <context:component-scan base-package="be.jeroenbellen"/>
 
 </beans>
