@@ -76,8 +76,8 @@ public class AnnotatedMemcachedIntegrationTest {
 
     @Test
     public void testCacheIgnoreArgs() throws Throwable {
-        this.myTestService.greet("Jeroen");
-        assertEquals("Hello, Jeroen", this.myTestService.greet("Een andere naam"));
+        this.myTestService.greetIgnoreArgs("Jeroen");
+        assertEquals("Hello, Jeroen", this.myTestService.greetIgnoreArgs("Een andere naam"));
     }
 
 }
@@ -87,6 +87,11 @@ class MyTestService {
 
     @Memcacheable
     public String greet(String name) {
+        return "Hello, " + name;
+    }
+
+    @Memcacheable(ignoreArguments = true)
+    public String greetIgnoreArgs(String name) {
         return "Hello, " + name;
     }
 

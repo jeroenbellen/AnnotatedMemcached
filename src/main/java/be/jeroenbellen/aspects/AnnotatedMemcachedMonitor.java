@@ -24,7 +24,7 @@ public class AnnotatedMemcachedMonitor {
     @Around("execution(* *..*(..)) && @annotation(memcacheable)")
     public Object cache(final ProceedingJoinPoint joinPoint, final Memcacheable memcacheable) throws Throwable {
         this.logger.debug("Doing magic!");
-        final String key = argsKey(joinPoint);
+        final String key = (memcacheable != null && memcacheable.ignoreArguments()) ? key(joinPoint) : argsKey(joinPoint);
         Object value = this.cache.get(key);
         if (value == null) {
             this.logger.debug("First time, lets cache!");

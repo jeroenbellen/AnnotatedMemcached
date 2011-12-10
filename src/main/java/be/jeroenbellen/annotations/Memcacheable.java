@@ -14,4 +14,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Memcacheable {
     int expireTime() default 0;
+    boolean ignoreArguments() default false;
 }
