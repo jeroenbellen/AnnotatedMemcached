@@ -25,6 +25,7 @@ public class AnnotatedMemcachedTest {
 
     private ProceedingJoinPoint testPoint;
     private ICache cache;
+    private String expectedKey;
 
     @Before
     public void setUp() {
@@ -66,8 +67,7 @@ public class AnnotatedMemcachedTest {
             }
 
             public Object[] getArgs() {
-                fail(failMessage);
-                return null;
+                return new Object[] {"a", "b", "c"};
             }
 
             public Signature getSignature() {
@@ -117,6 +117,13 @@ public class AnnotatedMemcachedTest {
                 return null;
             }
         };
+        this.expectedKey = new StringBuilder()
+                .append(testPoint.getSignature().getDeclaringTypeName())
+                .append("_")
+                .append(testPoint.getSignature().getName())
+                .append("_")
+                .append("a|b|c|".hashCode())
+                .toString();
     }
 
     @Test
@@ -129,11 +136,6 @@ public class AnnotatedMemcachedTest {
     public void testCacheKey() throws Throwable {
         AnnotatedMemcachedMonitor amm = new AnnotatedMemcachedMonitor(this.cache);
         amm.cache(testPoint, null);
-        String expectedKey = new StringBuilder()
-                .append(testPoint.getSignature().getDeclaringTypeName())
-                .append("_")
-                .append(testPoint.getSignature().getName())
-                .toString();
         assertTrue(amm.getCache().containsKey(expectedKey));
     }
 
@@ -141,11 +143,6 @@ public class AnnotatedMemcachedTest {
     public void testCacheIsFilled() throws Throwable {
         AnnotatedMemcachedMonitor amm = new AnnotatedMemcachedMonitor(this.cache);
         amm.cache(testPoint, null);
-        String expectedKey = new StringBuilder()
-                .append(testPoint.getSignature().getDeclaringTypeName())
-                .append("_")
-                .append(testPoint.getSignature().getName())
-                .toString();
         final Object value = amm.getCache().get(expectedKey);
         assertTrue(BigDecimal.ONE.equals(value));
     }

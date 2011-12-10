@@ -2,15 +2,10 @@ package be.jeroenbellen.aspects;
 
 import be.jeroenbellen.annotations.Memcacheable;
 import be.jeroenbellen.cache.ICache;
-import net.rubyeye.xmemcached.XMemcachedClient;
 import org.apache.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * User: jeroen
@@ -29,7 +24,7 @@ public class AnnotatedMemcachedMonitor {
     @Around("execution(* *..*(..)) && @annotation(memcacheable)")
     public Object cache(final ProceedingJoinPoint joinPoint, final Memcacheable memcacheable) throws Throwable {
         this.logger.debug("Doing magic!");
-        final String key = key(joinPoint);
+        final String key = argsKey(joinPoint);
         Object value = this.cache.get(key);
         if (value == null) {
             this.logger.debug("First time, lets cache!");
@@ -37,10 +32,19 @@ public class AnnotatedMemcachedMonitor {
             if (memcacheable != null && memcacheable.expireTime() != 0) {
                 cache.put(key, value, memcacheable.expireTime());
             } else {
-            cache.put(key, value);
+                cache.put(key, value);
             }
         }
         return value;
+    }
+
+    private String argsKey(ProceedingJoinPoint joinPoint) {
+        final StringBuilder stringBuilder = new StringBuilder(this.key(joinPoint));
+        StringBuilder argKey = new StringBuilder();
+        for (Object obj : joinPoint.getArgs()) {
+            argKey.append(obj.toString()).append("|");
+        }
+        return stringBuilder.append("_").append(argKey.toString().hashCode()).toString();
     }
 
     private String key(ProceedingJoinPoint joinPoint) {

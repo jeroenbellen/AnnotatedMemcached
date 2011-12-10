@@ -4,6 +4,7 @@ import be.jeroenbellen.annotations.Memcacheable;
 import net.rubyeye.xmemcached.XMemcachedClient;
 import net.rubyeye.xmemcached.exception.MemcachedException;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import java.util.Date;
 import java.util.concurrent.TimeoutException;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -33,7 +35,7 @@ public class AnnotatedMemcachedIntegrationTest {
     @Autowired
     private XMemcachedClient xMemcachedClient;
 
-    private String testKey = "be.jeroenbellen.aspects.MyTestService_greet";
+    private String testKey = "be.jeroenbellen.aspects.MyTestService_greet_" + "Jeroen|".hashCode();
 
     @Before
     public void clearCache() throws MemcachedException, TimeoutException, InterruptedException {
@@ -60,7 +62,7 @@ public class AnnotatedMemcachedIntegrationTest {
     @Test
     public void testCache() throws Throwable {
         this.myTestService.greet("Jeroen");
-        assertEquals("Hello, Jeroen", this.myTestService.greet("Een andere naam"));
+        assertNotSame("Hello, Jeroen", this.myTestService.greet("Een andere naam"));
     }
 
     @Test
@@ -70,6 +72,12 @@ public class AnnotatedMemcachedIntegrationTest {
         assertEquals(now.getTime(), this.myTestService.getCurrentTime().getTime());
         Thread.sleep(2000);
         assertTrue(now.getTime() != this.myTestService.getCurrentTime().getTime());
+    }
+
+    @Test
+    public void testCacheIgnoreArgs() throws Throwable {
+        this.myTestService.greet("Jeroen");
+        assertEquals("Hello, Jeroen", this.myTestService.greet("Een andere naam"));
     }
 
 }
