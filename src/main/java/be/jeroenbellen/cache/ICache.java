@@ -8,5 +8,6 @@ package be.jeroenbellen.cache;
 public interface ICache {
     Object get(String key);
     void put(String key, Object data);
+    void put(String key, Object data, int exp);
     boolean containsKey(String key);
 }

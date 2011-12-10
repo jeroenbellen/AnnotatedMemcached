@@ -26,7 +26,6 @@ public class AnnotatedMemcachedMonitor {
         this.cache = cache;
     }
 
-//    @Around("execution(@be.jeroenbellen.annotations.Memcacheable * *..*(..))")
     @Around("execution(* *..*(..)) && @annotation(memcacheable)")
     public Object cache(final ProceedingJoinPoint joinPoint, final Memcacheable memcacheable) throws Throwable {
         this.logger.debug("Doing magic!");
@@ -35,7 +34,11 @@ public class AnnotatedMemcachedMonitor {
         if (value == null) {
             this.logger.debug("First time, lets cache!");
             value = joinPoint.proceed();
+            if (memcacheable != null && memcacheable.expireTime() != 0) {
+                cache.put(key, value, memcacheable.expireTime());
+            } else {
             cache.put(key, value);
+            }
         }
         return value;
     }

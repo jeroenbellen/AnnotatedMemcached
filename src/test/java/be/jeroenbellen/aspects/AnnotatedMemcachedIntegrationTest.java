@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.concurrent.TimeoutException;
 
 import static org.junit.Assert.assertEquals;
@@ -61,6 +63,15 @@ public class AnnotatedMemcachedIntegrationTest {
         assertEquals("Hello, Jeroen", this.myTestService.greet("Een andere naam"));
     }
 
+    @Test
+    public void testExpireTime() throws InterruptedException {
+        Date now = this.myTestService.getCurrentTime();
+        Thread.sleep(1000);
+        assertEquals(now.getTime(), this.myTestService.getCurrentTime().getTime());
+        Thread.sleep(2000);
+        assertTrue(now.getTime() != this.myTestService.getCurrentTime().getTime());
+    }
+
 }
 
 @Component
@@ -69,5 +80,10 @@ class MyTestService {
     @Memcacheable
     public String greet(String name) {
         return "Hello, " + name;
+    }
+
+    @Memcacheable(expireTime = 3)
+    public Date getCurrentTime() {
+        return Calendar.getInstance().getTime();
     }
 }

@@ -170,6 +170,11 @@ public class AnnotatedMemcachedTest {
             this.cache.put(key, data);
         }
 
+        @Override
+        public void put(String key, Object data, int exp) {
+           this.cache.put(key, data);
+        }
+
         public boolean containsKey(String key) {
             return this.cache.containsKey(key);
         }

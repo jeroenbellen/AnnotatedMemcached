@@ -32,8 +32,13 @@ public class MemcachedCache implements ICache {
     }
 
     public void put(String key, Object data) {
+        put(key, data, 0);
+    }
+
+    @Override
+    public void put(String key, Object data, int exp) {
         try {
-            this.xMemcachedClient.set(key, 0, data);
+            this.xMemcachedClient.set(key, exp, data);
         } catch (TimeoutException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
