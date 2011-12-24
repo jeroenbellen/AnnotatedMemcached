@@ -4,7 +4,6 @@ import be.jeroenbellen.annotations.Memcacheable;
 import net.rubyeye.xmemcached.XMemcachedClient;
 import net.rubyeye.xmemcached.exception.MemcachedException;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +25,7 @@ import static org.junit.Assert.assertTrue;
  * Time: 8:10 PM
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:be/jeroenbellen/system-test-config.xml"})
+@ContextConfiguration(locations = {"classpath:system-test-config.xml"})
 public class AnnotatedMemcachedIntegrationTest {
     @Autowired
     private MyTestService myTestService;
